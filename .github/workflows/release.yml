@@ -47,6 +47,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      - name: Configure pnpm
+        run: pnpm config set strict-dep-builds false
+
       - name: Install app dependencies
         run: pnpm install
 
