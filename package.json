@@ -15,7 +15,7 @@
     "check:design": "node scripts/check-design-rules.mjs",
     "verify": "pnpm format:check && pnpm lint && pnpm check:design && pnpm typecheck && pnpm test",
     "prepare": "husky",
-    "gen:favicon": "node scripts/generate-favicon.mjs"
+    "gen:icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

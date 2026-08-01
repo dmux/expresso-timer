@@ -44,3 +44,10 @@ is added or updated, because the registry ships them by default; re-style with
   agree. If it fails, one of the two halves moved.
 - The theme init script in `layout.tsx` must stay inline and blocking, and `<html>` keeps
   `suppressHydrationWarning` because that script sets `data-theme` before React exists.
+- Every icon — favicon, iOS, Android, maskable — comes from one 16×16 matrix in
+  `scripts/generate-icons.mjs`. Edit the matrix, run `pnpm gen:icons`, commit the output;
+  the PNGs are not built on deploy.
+- The service worker only registers in production builds, so `pnpm dev` never sees it. If
+  you test a production build locally, unregister it afterwards or it keeps serving the
+  cached prod assets over your dev server. Bump `CACHE` in `public/sw.js` whenever a
+  cached path stops existing.
