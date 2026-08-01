@@ -1,4 +1,3 @@
-import { PHASE_LABELS } from "@/domain/timer/phase"
 import {
   advance,
   createSession,
@@ -35,6 +34,7 @@ export type PomodoroDependencies = {
   readonly settingsRepository: SettingsRepository
   readonly sessionLog: SessionLog
   readonly notifier: Notifier
+  readonly translate: (key: string) => string
 }
 
 type Listener = () => void
@@ -122,8 +122,12 @@ export class PomodoroService {
     if (this.settings.soundEnabled) this.deps.notifier.chime()
     if (this.settings.notificationsEnabled) {
       this.deps.notifier.notify(
-        `${PHASE_LABELS[event.phase]} concluído`,
-        `Agora: ${PHASE_LABELS[event.next].toLowerCase()}.`
+        this.deps
+          .translate("notification.completed")
+          .replace("{phase}", this.deps.translate(`phase.${event.phase}`)),
+        this.deps
+          .translate("notification.next")
+          .replace("{phase}", this.deps.translate(`phase.${event.next}`).toLowerCase())
       )
     }
   }

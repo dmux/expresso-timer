@@ -1,7 +1,7 @@
 import { useState } from "react"
 import type { SessionRecord } from "@/application/ports"
-import { PHASE_LABELS } from "@/domain/timer/phase"
 import { calculateInsights } from "@/domain/timer/insights"
+import { useTranslation, type TranslationKey } from "@/ui/i18n/LanguageContext"
 import { ScrollArea } from "@/ui/components/ui/scroll-area"
 import {
   Table,
@@ -17,6 +17,7 @@ type SessionHistoryProps = {
 }
 
 export function SessionHistory({ history }: SessionHistoryProps) {
+  const { t, locale } = useTranslation()
   const [now] = useState(() => Date.now())
   const { todayFocusMs, weekFocusMs, dailyTrendMs, weeklyTrendMs, monthlyTrendMs } =
     calculateInsights(history, now)
@@ -30,7 +31,7 @@ export function SessionHistory({ history }: SessionHistoryProps) {
       <div className="flex gap-[calc(var(--px)*2)] border-b-[length:var(--px)] border-[var(--px-line)] pb-[calc(var(--px)*4)]">
         <div className="flex flex-1 flex-col items-center justify-start">
           <span className="text-center text-[calc(var(--px)*2.5)] text-[var(--px-text-muted)]">
-            Foco Hoje
+            {t("history.today")}
           </span>
           <span className="mt-[calc(var(--px)*1)] text-[calc(var(--px)*3.5)] tabular-nums">
             {todayFocusMin} min
@@ -39,7 +40,7 @@ export function SessionHistory({ history }: SessionHistoryProps) {
         </div>
         <div className="flex flex-1 flex-col items-center justify-start border-l-[length:var(--px)] border-[var(--px-line)]">
           <span className="text-center text-[calc(var(--px)*2.5)] text-[var(--px-text-muted)]">
-            Na Semana
+            {t("history.week")}
           </span>
           <span className="mt-[calc(var(--px)*1)] text-[calc(var(--px)*3.5)] tabular-nums">
             {weekFocusMin} min
@@ -48,7 +49,7 @@ export function SessionHistory({ history }: SessionHistoryProps) {
         </div>
         <div className="flex flex-1 flex-col items-center justify-start border-l-[length:var(--px)] border-[var(--px-line)]">
           <span className="text-center text-[calc(var(--px)*2.5)] text-[var(--px-text-muted)]">
-            No Mês
+            {t("history.month")}
           </span>
           <span className="mt-[calc(var(--px)*1)] text-[calc(var(--px)*3.5)] tabular-nums">
             {monthFocusMin} min
@@ -59,30 +60,32 @@ export function SessionHistory({ history }: SessionHistoryProps) {
 
       {history.length === 0 ? (
         <p className="py-[calc(var(--px)*6)] text-center text-[calc(var(--px)*2.5)] text-[var(--px-text-muted)]">
-          Nenhuma sessão ainda.
+          {t("history.empty")}
         </p>
       ) : (
         <ScrollArea className="h-[calc(var(--px)*45)]">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Fase</TableHead>
-                <TableHead>Duração</TableHead>
-                <TableHead>Quando</TableHead>
+                <TableHead>{t("history.col.phase")}</TableHead>
+                <TableHead>{t("history.col.duration")}</TableHead>
+                <TableHead>{t("history.col.when")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {history.map((record, idx) => (
                 <TableRow key={`${record.completedAt}-${idx}`}>
-                  <TableCell>{PHASE_LABELS[record.phase]}</TableCell>
+                  <TableCell>{t(`phase.${record.phase}` as TranslationKey)}</TableCell>
                   <TableCell>
                     {Math.round(record.elapsedMs / 60_000)} min
                     {!record.ranToCompletion && (
-                      <span className="text-[var(--px-text-muted)]"> (pulado)</span>
+                      <span className="text-[var(--px-text-muted)]">
+                        {t("history.skipped")}
+                      </span>
                     )}
                   </TableCell>
                   <TableCell className="text-[var(--px-text-muted)]">
-                    {formatTime(record.completedAt)}
+                    {formatTime(record.completedAt, locale)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -94,8 +97,8 @@ export function SessionHistory({ history }: SessionHistoryProps) {
   )
 }
 
-function formatTime(epochMs: number): string {
-  return new Date(epochMs).toLocaleTimeString("pt-BR", {
+function formatTime(epochMs: number, locale: string): string {
+  return new Date(epochMs).toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   })

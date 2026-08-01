@@ -8,8 +8,3 @@ export const CUP_DESIGNS = ["mug", "paper"] as const
 export type CupDesign = (typeof CUP_DESIGNS)[number]
 
 export const DEFAULT_CUP_DESIGN: CupDesign = "mug"
-
-export const CUP_DESIGN_LABELS: Record<CupDesign, string> = {
-  mug: "Xícara",
-  paper: "Copo",
-}

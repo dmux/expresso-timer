@@ -7,10 +7,12 @@ import { Button } from "@/ui/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/components/ui/tooltip"
 import { useTheme, type ThemePreference } from "@/ui/theme"
 
-const OPTIONS: { value: ThemePreference; label: string; sprite: Sprite }[] = [
-  { value: "light", label: "Claro", sprite: ICON_SUN },
-  { value: "dark", label: "Escuro", sprite: ICON_MOON },
-  { value: "system", label: "Sistema", sprite: ICON_AUTO },
+import { useTranslation, type TranslationKey } from "@/ui/i18n/LanguageContext"
+
+const OPTIONS: { value: ThemePreference; sprite: Sprite }[] = [
+  { value: "light", sprite: ICON_SUN },
+  { value: "dark", sprite: ICON_MOON },
+  { value: "system", sprite: ICON_AUTO },
 ]
 
 /**
@@ -20,6 +22,7 @@ const OPTIONS: { value: ThemePreference; label: string; sprite: Sprite }[] = [
  */
 export function ThemeToggle() {
   const { preference, setPreference } = useTheme()
+  const { t } = useTranslation()
 
   return (
     <div
@@ -39,7 +42,7 @@ export function ThemeToggle() {
                   size="icon"
                   role="radio"
                   aria-checked={active}
-                  aria-label={option.label}
+                  aria-label={t(`theme.${option.value}` as TranslationKey)}
                   className={active ? "shadow-none pixel-bevel-inset" : undefined}
                 />
               }
@@ -51,7 +54,9 @@ export function ThemeToggle() {
                 className="w-[calc(var(--px)*5)]"
               />
             </TooltipTrigger>
-            <TooltipContent>{option.label}</TooltipContent>
+            <TooltipContent>
+              {t(`theme.${option.value}` as TranslationKey)}
+            </TooltipContent>
           </Tooltip>
         )
       })}

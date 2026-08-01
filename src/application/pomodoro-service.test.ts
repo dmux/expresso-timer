@@ -60,6 +60,7 @@ function build(settings: PomodoroSettings | null = null) {
     settingsRepository,
     sessionLog,
     notifier,
+    translate: (key: string) => key,
   })
   return { service, clock, settingsRepository, sessionLog, notifier }
 }

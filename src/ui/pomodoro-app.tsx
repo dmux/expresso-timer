@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 
 import { msToClock } from "@/domain/shared/duration"
-import { PHASE_LABELS } from "@/domain/timer/phase"
 import { CoffeeCupCanvas } from "@/ui/components/coffee-cup-canvas"
 import { PhaseBar } from "@/ui/components/phase-bar"
 import { PixelPanel } from "@/ui/components/pixel-panel"
@@ -12,6 +11,7 @@ import { ThemeToggle } from "@/ui/components/theme-toggle"
 import { TimerControls } from "@/ui/components/timer-controls"
 import { TimerDisplay } from "@/ui/components/timer-display"
 import { usePomodoro } from "@/ui/hooks/use-pomodoro"
+import { useTranslation, type TranslationKey } from "@/ui/i18n/LanguageContext"
 
 export function PomodoroApp() {
   const {
@@ -26,12 +26,14 @@ export function PomodoroApp() {
     updateSettings,
   } = usePomodoro()
 
+  const { t } = useTranslation()
+
   useEffect(() => {
     document.title =
       session.status === "running"
-        ? `${msToClock(remainingMs)} · ${PHASE_LABELS[session.phase]}`
-        : "Expresso Timer"
-  }, [remainingMs, session.status, session.phase])
+        ? `${msToClock(remainingMs)} · ${t(`phase.${session.phase}` as TranslationKey)}`
+        : t("app.title")
+  }, [remainingMs, session.status, session.phase, t])
 
   return (
     <main className="flex flex-1 items-center justify-center pixel-dither-soft p-[calc(var(--px)*4)]">
@@ -43,7 +45,7 @@ export function PomodoroApp() {
               the title sits left and the toggle right, which always fits. */}
           <div className="hidden w-[calc(var(--px)*38)] sm:block" aria-hidden="true" />
           <h1 className="text-[calc(var(--px)*3)] tracking-[var(--px)] uppercase sm:text-[calc(var(--px)*4)] sm:tracking-[calc(var(--px)*1.5)]">
-            Expresso Timer
+            {t("app.title")}
           </h1>
           <div className="flex justify-end sm:w-[calc(var(--px)*38)]">
             <ThemeToggle />

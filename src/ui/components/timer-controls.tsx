@@ -12,6 +12,8 @@ import { Button } from "@/ui/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/components/ui/tooltip"
 import type { Sprite } from "@/domain/pixelart/sprite"
 
+import { useTranslation } from "@/ui/i18n/LanguageContext"
+
 type TimerControlsProps = {
   status: SessionStatus
   onToggle: () => void
@@ -20,6 +22,7 @@ type TimerControlsProps = {
 }
 
 export function TimerControls({ status, onToggle, onReset, onSkip }: TimerControlsProps) {
+  const { t } = useTranslation()
   const running = status === "running"
 
   return (
@@ -30,11 +33,15 @@ export function TimerControls({ status, onToggle, onReset, onSkip }: TimerContro
           color="currentColor"
           className="w-[calc(var(--px)*5)]"
         />
-        {running ? "Pausar" : status === "paused" ? "Retomar" : "Iniciar"}
+        {running
+          ? t("timer.pause")
+          : status === "paused"
+            ? t("timer.resume")
+            : t("timer.play")}
       </Button>
 
-      <IconButton label="Reiniciar fase" sprite={ICON_RESET} onClick={onReset} />
-      <IconButton label="Pular fase" sprite={ICON_SKIP} onClick={onSkip} />
+      <IconButton label={t("timer.reset")} sprite={ICON_RESET} onClick={onReset} />
+      <IconButton label={t("timer.skip")} sprite={ICON_SKIP} onClick={onSkip} />
     </div>
   )
 }
