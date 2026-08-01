@@ -1,4 +1,4 @@
-import { PALETTE } from "@/domain/pixelart/palette"
+import { cssVarName } from "@/domain/pixelart/palette"
 import { resolveCells, type Sprite } from "@/domain/pixelart/sprite"
 import { cn } from "@/ui/lib/utils"
 
@@ -42,7 +42,9 @@ export function PixelSprite({
             y={Math.floor(index / sprite.width)}
             width={1}
             height={1}
-            fill={color ?? PALETTE[cell]}
+            // Through the variable rather than the constant, so a sprite rendered as
+            // SVG follows the theme exactly like the one on the canvas does.
+            fill={color ?? `var(${cssVarName(cell)})`}
           />
         )
       )}

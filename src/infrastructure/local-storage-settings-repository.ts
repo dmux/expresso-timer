@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 import type { SettingsRepository } from "@/application/ports"
+import { CUP_DESIGNS, DEFAULT_CUP_DESIGN } from "@/domain/cup/cup-design"
 import {
   DEFAULT_SETTINGS,
   SETTINGS_LIMITS,
@@ -21,6 +22,9 @@ const schema = z.object({
   autoStartNext: z.boolean(),
   soundEnabled: z.boolean(),
   notificationsEnabled: z.boolean(),
+  // Defaulted rather than required: settings saved before the design picker existed
+  // must still load, instead of failing the parse and resetting every other field.
+  cupDesign: z.enum(CUP_DESIGNS).default(DEFAULT_CUP_DESIGN),
 })
 
 export function createLocalStorageSettingsRepository(

@@ -16,12 +16,16 @@ export type SteamParticle = {
 /** Injected so a seeded generator makes the whole simulation reproducible in tests. */
 export type Rng = () => number
 
-/* Tuned for the 48-wide cup: a wider, slower, denser plume than a 24-wide mug needs. */
+/*
+ * Tuned for the 45-wide cup: a wide, dense plume. Life times speed is how far a particle
+ * climbs, and it is bounded on purpose — the renderer only reserves a dozen or so rows
+ * of headroom above the cup, and anything that outruns it is clipped mid-fade.
+ */
 const MAX_EMISSIONS_PER_SECOND = 26
-const MIN_LIFE_MS = 1_400
-const LIFE_SPREAD_MS = 1_000
-const MIN_SPEED = 0.008
-const SPEED_SPREAD = 0.006
+const MIN_LIFE_MS = 1_200
+const LIFE_SPREAD_MS = 800
+const MIN_SPEED = 0.005
+const SPEED_SPREAD = 0.004
 const MAX_DRIFT = 5
 const WOBBLE_RATE = 0.004
 

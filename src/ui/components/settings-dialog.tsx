@@ -1,6 +1,8 @@
 "use client"
 
 import type { SessionRecord } from "@/application/ports"
+import { CUP_DESIGN_LABELS, CUP_DESIGNS, type CupDesign } from "@/domain/cup/cup-design"
+import { CUP_ART } from "@/domain/pixelart/sprites/cups"
 import { ICON_GEAR } from "@/domain/pixelart/sprites/icons"
 import { SETTINGS_LIMITS, type PomodoroSettings } from "@/domain/timer/settings"
 import { PixelSprite } from "@/ui/components/pixel-sprite"
@@ -55,8 +57,12 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Ajustes</DialogTitle>
+          {/* Broken by hand rather than left to wrap: the close button sits over the
+              right end of the first line, and one sentence per line clears it. */}
           <DialogDescription>
-            Durações em minutos. Mudanças valem já na fase atual.
+            Durações em minutos.
+            <br />
+            Mudanças valem já na fase atual.
           </DialogDescription>
         </DialogHeader>
 
@@ -97,6 +103,13 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
                 limits={SETTINGS_LIMITS.cyclesUntilLongBreak}
                 onChange={(cyclesUntilLongBreak) => onChange({ cyclesUntilLongBreak })}
               />
+
+              <div className="flex flex-col gap-[calc(var(--px)*3)] border-t-[length:var(--px)] border-[var(--px-line)] pt-[calc(var(--px)*4)]">
+                <DesignPicker
+                  value={settings.cupDesign}
+                  onChange={(cupDesign) => onChange({ cupDesign })}
+                />
+              </div>
 
               <div className="flex flex-col gap-[calc(var(--px)*3)] border-t-[length:var(--px)] border-[var(--px-line)] pt-[calc(var(--px)*4)]">
                 <Toggle
@@ -162,6 +175,48 @@ function MinuteSlider({
         value={value}
         onValueChange={(next) => onChange(Array.isArray(next) ? next[0] : next)}
       />
+    </div>
+  )
+}
+
+/**
+ * Two radios drawn as their own sprite: at this size a label alone ("Xícara" / "Copo")
+ * says far less than the silhouette does, and the preview is the same art the canvas
+ * renders, so what is picked is exactly what appears.
+ */
+function DesignPicker({
+  value,
+  onChange,
+}: {
+  value: CupDesign
+  onChange: (design: CupDesign) => void
+}) {
+  return (
+    <div className="flex flex-col gap-[calc(var(--px)*2)]">
+      <span className="text-[calc(var(--px)*3)]">Modelo do copo</span>
+      <div
+        role="radiogroup"
+        aria-label="Modelo do copo"
+        className="flex gap-[calc(var(--px)*3)]"
+      >
+        {CUP_DESIGNS.map((design) => (
+          <Button
+            key={design}
+            role="radio"
+            aria-checked={value === design}
+            variant={value === design ? "default" : "outline"}
+            onClick={() => onChange(design)}
+            className="h-auto flex-1 flex-col gap-[calc(var(--px)*2)] py-[calc(var(--px)*3)] text-[calc(var(--px)*2.5)]"
+          >
+            <PixelSprite
+              sprite={CUP_ART[design].sprite}
+              level={1}
+              className="w-[calc(var(--px)*14)]"
+            />
+            {CUP_DESIGN_LABELS[design]}
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }

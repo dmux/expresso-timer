@@ -3,7 +3,7 @@
  *
  * These are deliberately *not* interface colours. A panel background or a body of text
  * has to invert between themes; a ceramic mug does not. Interface colour lives in the
- * semantic `--px-surface` / `--px-text` layer in `globals.css`, and only these eight
+ * semantic `--px-surface` / `--px-text` layer in `globals.css`, and only these seven
  * names are ever valid inside a sprite.
  *
  * The canvas resolves them through the CSS variables at runtime, so the stylesheet owns

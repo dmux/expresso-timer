@@ -24,6 +24,12 @@
 :root {
   --px: 3px;
 
+  /* One sprite pixel of the cup canvas. Always a whole multiple of --px, and stepped
+     separately because the cup is the one element wide enough to hit the panel's edge:
+     at --px 3 the 45-wide sprite needs a viewport of ~470px before it can take the
+     third step without overflowing. */
+  --px-cup: 9px;
+
   /* sprite palette — light */
   --px-ink: #4a4340;
   --px-cream: #f4f2ef;
@@ -93,9 +99,19 @@
   }
 }
 
+/* Below ~470px the panel is too narrow for 45 sprite pixels at 9px each, so the cup
+   drops a step rather than overflow. Still a whole multiple of --px on both sides of
+   the 380px cut-off: 3× at --px 2, 2× at --px 3. */
+@media (max-width: 469px) {
+  :root {
+    --px-cup: 6px;
+  }
+}
+
 @media (min-width: 1280px) {
   :root {
     --px: 4px;
+    --px-cup: 12px;
   }
 }
 

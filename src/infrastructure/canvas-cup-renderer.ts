@@ -5,6 +5,7 @@ import {
   puffOffsets,
   type SteamParticle,
 } from "@/domain/cup/steam"
+import type { CupDesign } from "@/domain/cup/cup-design"
 import {
   COLOR_NAMES,
   cssVarName,
@@ -12,21 +13,20 @@ import {
   type ColorName,
 } from "@/domain/pixelart/palette"
 import { resolveCells } from "@/domain/pixelart/sprite"
-import { CUP_SPRITE } from "@/domain/pixelart/sprites/cup"
+import { CUP_ART, CUP_HEIGHT, CUP_WIDTH } from "@/domain/pixelart/sprites/cups"
 
-/** Headroom above the mug for steam, in sprite pixels. Matches the particles' reach. */
-const STEAM_HEIGHT = 26
+/** Headroom above the cup for steam, in sprite pixels. Matches the particles' reach. */
+const STEAM_HEIGHT = 14
 
-export const VIEWPORT_WIDTH = CUP_SPRITE.width
-export const VIEWPORT_HEIGHT = STEAM_HEIGHT + CUP_SPRITE.height
+export const VIEWPORT_WIDTH = CUP_WIDTH
+export const VIEWPORT_HEIGHT = STEAM_HEIGHT + CUP_HEIGHT
 export const CUP_OFFSET_Y = STEAM_HEIGHT
 
 export type CupFrame = {
+  readonly design: CupDesign
   /** 1 = full, 0 = empty. */
   readonly level: number
   readonly steam: readonly SteamParticle[]
-  /** Whole sprite pixels — the idle bob. Fractional values would blur the sprite. */
-  readonly bobOffset: number
 }
 
 export type CupRenderer = {
@@ -86,19 +86,19 @@ export function createCanvasCupRenderer(canvas: HTMLCanvasElement): CupRenderer 
     draw(frame) {
       ctx.clearRect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
       drawSteam(ctx, frame.steam, palette)
-      drawCup(ctx, frame.level, frame.bobOffset, palette)
+      drawCup(ctx, frame, palette)
     },
   }
 }
 
 function drawCup(
   ctx: CanvasRenderingContext2D,
-  level: number,
-  bobOffset: number,
+  { design, level }: CupFrame,
   palette: ResolvedPalette
 ) {
-  const cells = resolveCells(CUP_SPRITE, level)
-  const { width } = CUP_SPRITE
+  const { sprite } = CUP_ART[design]
+  const cells = resolveCells(sprite, level)
+  const { width } = sprite
   let current: string | null = null
 
   for (let index = 0; index < cells.length; index += 1) {
@@ -112,7 +112,7 @@ function drawCup(
     }
 
     const x = index % width
-    const y = Math.floor(index / width) + CUP_OFFSET_Y + bobOffset
+    const y = Math.floor(index / width) + CUP_OFFSET_Y
     ctx.fillRect(x, y, 1, 1)
   }
 }

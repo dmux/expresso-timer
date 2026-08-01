@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest"
 
+import { CUP_DESIGNS } from "../cup/cup-design"
 import { PALETTE } from "./palette"
 import { parseSprite, resolveCells, type Sprite } from "./sprite"
-import { CUP_SPRITE, CUP_STEAM_ORIGIN_X } from "./sprites/cup"
+import { CUP_ART, CUP_HEIGHT, CUP_WIDTH } from "./sprites/cups"
 import * as icons from "./sprites/icons"
 
 describe("parseSprite", () => {
@@ -29,22 +30,30 @@ describe("parseSprite", () => {
   })
 })
 
-describe("CUP_SPRITE", () => {
+describe.each(CUP_DESIGNS)("the %s design", (design) => {
+  const { sprite, steamOrigin } = CUP_ART[design]
+
+  // The renderer sizes one canvas from CUP_WIDTH/CUP_HEIGHT and then draws whichever
+  // design is selected into it, so a sprite of another size would paint out of bounds.
+  it("draws into the shared viewport", () => {
+    expect(`${sprite.width}x${sprite.height}`).toBe(`${CUP_WIDTH}x${CUP_HEIGHT}`)
+  })
+
   it("uses only palette colours", () => {
-    for (const cell of CUP_SPRITE.cells) {
+    for (const cell of sprite.cells) {
       if (cell !== null) expect(PALETTE).toHaveProperty(cell)
     }
   })
 
   it("has a liquid region deep enough for the drain to read as gradual", () => {
-    const liquid = CUP_SPRITE.liquid
+    const liquid = sprite.liquid
     expect(liquid).not.toBeNull()
     expect(liquid!.bottomRow - liquid!.topRow + 1).toBeGreaterThanOrEqual(10)
   })
 
   it("has a contiguous liquid region — no floating pockets of coffee", () => {
     const rows = new Set(
-      CUP_SPRITE.liquid!.indices.map((index) => Math.floor(index / CUP_SPRITE.width))
+      sprite.liquid!.indices.map((index) => Math.floor(index / sprite.width))
     )
     const sorted = [...rows].sort((a, b) => a - b)
 
@@ -53,11 +62,31 @@ describe("CUP_SPRITE", () => {
     })
   })
 
-  it("emits steam from inside the mug opening", () => {
-    expect(CUP_STEAM_ORIGIN_X).toBeGreaterThan(0)
-    expect(CUP_STEAM_ORIGIN_X).toBeLessThan(CUP_SPRITE.width)
+  it("emits steam from above the liquid, inside the silhouette", () => {
+    expect(steamOrigin.x).toBeGreaterThan(0)
+    expect(steamOrigin.x).toBeLessThan(sprite.width)
+    expect(steamOrigin.y).toBeLessThanOrEqual(sprite.liquid!.topRow)
+  })
+
+  // The surface can only ever move down, so a well that widened again on the way down
+  // would make the level jump sideways as it drained.
+  it("never widens on the way down", () => {
+    const widths = liquidWidths(sprite)
+    for (let i = 1; i < widths.length; i += 1) {
+      expect(widths[i]).toBeLessThanOrEqual(widths[i - 1])
+    }
   })
 })
+
+/** Cells per row of the liquid region — the interior width, handle excluded. */
+function liquidWidths(sprite: Sprite): number[] {
+  const perRow = new Map<number, number>()
+  for (const index of sprite.liquid!.indices) {
+    const row = Math.floor(index / sprite.width)
+    perRow.set(row, (perRow.get(row) ?? 0) + 1)
+  }
+  return [...perRow.entries()].sort(([a], [b]) => a - b).map(([, count]) => count)
+}
 
 describe("icons", () => {
   it("are all exactly 8x8", () => {

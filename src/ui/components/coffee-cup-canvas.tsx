@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react"
 
+import type { CupDesign } from "@/domain/cup/cup-design"
 import { levelFor, steamIntensity } from "@/domain/cup/cup-level"
 import { advanceSteam, type SteamParticle } from "@/domain/cup/steam"
-import { CUP_STEAM_ORIGIN_X, CUP_STEAM_ORIGIN_Y } from "@/domain/pixelart/sprites/cup"
+import { CUP_ART } from "@/domain/pixelart/sprites/cups"
 import { progress, type Session } from "@/domain/timer/session"
 import {
   createCanvasCupRenderer,
@@ -18,38 +19,26 @@ import {
 } from "@/ui/hooks/use-animation-frame"
 import { useTheme } from "@/ui/theme"
 
-const STEAM_ORIGIN = { x: CUP_STEAM_ORIGIN_X, y: CUP_STEAM_ORIGIN_Y }
-
-/** One sprite pixel every 600ms of bob — a whole pixel, never a fraction. */
-const BOB_PERIOD_MS = 1200
-
-/**
- * Sprite pixels per logical pixel. The 45-wide mug is nearly twice the old sprite, so
- * it draws at 2× rather than 3× to land at a similar size on screen — and staying an
- * integer multiple of `--px` is what keeps every edge sharp.
- */
-const SPRITE_SCALE = 2
-
 type CoffeeCupCanvasProps = {
   session: Session
+  design: CupDesign
 }
 
-export function CoffeeCupCanvas({ session }: CoffeeCupCanvasProps) {
+export function CoffeeCupCanvas({ session, design }: CoffeeCupCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rendererRef = useRef<CupRenderer | null>(null)
   const steamRef = useRef<SteamParticle[]>([])
-  const elapsedRef = useRef(0)
   const [pixelSize, setPixelSize] = useState(0)
   const reducedMotion = usePrefersReducedMotion()
   const { resolved: theme } = useTheme()
 
-  // The sprite tracks the same integer scale as the rest of the layout instead of
-  // stretching to fill a container, which is what keeps it on the pixel grid.
+  // The sprite tracks an integer scale set in the stylesheet instead of stretching to
+  // fill a container, which is what keeps it on the pixel grid.
   useEffect(() => {
     const read = () => {
-      const raw = getComputedStyle(document.documentElement).getPropertyValue("--px")
+      const raw = getComputedStyle(document.documentElement).getPropertyValue("--px-cup")
       const parsed = Number.parseInt(raw, 10)
-      setPixelSize((Number.isFinite(parsed) ? parsed : 3) * SPRITE_SCALE)
+      setPixelSize(Number.isFinite(parsed) ? parsed : 6)
     }
 
     read()
@@ -75,7 +64,6 @@ export function CoffeeCupCanvas({ session }: CoffeeCupCanvasProps) {
     const renderer = rendererRef.current
     if (!renderer) return
 
-    elapsedRef.current += dtMs
     const level = levelFor(session.phase, progress(session, Date.now()))
     const running = session.status === "running"
 
@@ -84,19 +72,12 @@ export function CoffeeCupCanvas({ session }: CoffeeCupCanvasProps) {
         steamRef.current,
         dtMs,
         running ? steamIntensity(level) : 0,
-        STEAM_ORIGIN,
+        CUP_ART[design].steamOrigin,
         Math.random
       )
     }
 
-    renderer.draw({
-      level,
-      steam: steamRef.current,
-      bobOffset:
-        running && !reducedMotion
-          ? Math.floor((elapsedRef.current % BOB_PERIOD_MS) / (BOB_PERIOD_MS / 2))
-          : 0,
-    })
+    renderer.draw({ design, level, steam: steamRef.current })
   }, pixelSize > 0)
 
   return (

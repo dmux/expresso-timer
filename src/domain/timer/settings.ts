@@ -1,3 +1,4 @@
+import { DEFAULT_CUP_DESIGN, type CupDesign } from "../cup/cup-design"
 import { MINUTE } from "../shared/duration"
 import type { Phase } from "./phase"
 
@@ -9,6 +10,8 @@ export type PomodoroSettings = {
   readonly autoStartNext: boolean
   readonly soundEnabled: boolean
   readonly notificationsEnabled: boolean
+  /** Purely cosmetic — `withSettings` leaves the running phase alone when it changes. */
+  readonly cupDesign: CupDesign
 }
 
 export const DEFAULT_SETTINGS: PomodoroSettings = {
@@ -19,6 +22,7 @@ export const DEFAULT_SETTINGS: PomodoroSettings = {
   autoStartNext: false,
   soundEnabled: true,
   notificationsEnabled: false,
+  cupDesign: DEFAULT_CUP_DESIGN,
 }
 
 /** Shared by the settings sliders and by the persistence schema, so both agree. */
