@@ -51,7 +51,12 @@ export function PomodoroApp() {
         </header>
 
         <div className="flex flex-col items-center gap-[calc(var(--px)*5)] p-[calc(var(--px)*5)]">
-          <CoffeeCupCanvas session={session} design={settings.cupDesign} />
+          <CoffeeCupCanvas
+            session={session}
+            design={settings.cupDesign}
+            milkAmount={settings.milkAmount}
+            cappuccinoFoam={settings.cappuccinoFoam}
+          />
 
           <TimerDisplay
             phase={session.phase}

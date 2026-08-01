@@ -12,6 +12,8 @@ export type PomodoroSettings = {
   readonly notificationsEnabled: boolean
   /** Purely cosmetic — `withSettings` leaves the running phase alone when it changes. */
   readonly cupDesign: CupDesign
+  readonly milkAmount: number
+  readonly cappuccinoFoam: boolean
 }
 
 export const DEFAULT_SETTINGS: PomodoroSettings = {
@@ -23,6 +25,8 @@ export const DEFAULT_SETTINGS: PomodoroSettings = {
   soundEnabled: true,
   notificationsEnabled: false,
   cupDesign: DEFAULT_CUP_DESIGN,
+  milkAmount: 20,
+  cappuccinoFoam: false,
 }
 
 /** Shared by the settings sliders and by the persistence schema, so both agree. */
@@ -31,6 +35,7 @@ export const SETTINGS_LIMITS = {
   shortBreakMinutes: { min: 1, max: 30 },
   longBreakMinutes: { min: 1, max: 60 },
   cyclesUntilLongBreak: { min: 2, max: 8 },
+  milkAmount: { min: 0, max: 100 },
 } as const
 
 export function durationFor(phase: Phase, settings: PomodoroSettings): number {

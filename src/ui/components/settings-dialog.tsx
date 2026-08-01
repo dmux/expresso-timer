@@ -109,6 +109,22 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
                   value={settings.cupDesign}
                   onChange={(cupDesign) => onChange({ cupDesign })}
                 />
+                {settings.cupDesign === "mug" && (
+                  <Toggle
+                    id="cappuccino-foam"
+                    label="Espuma de cappuccino"
+                    checked={settings.cappuccinoFoam}
+                    onChange={(cappuccinoFoam) => onChange({ cappuccinoFoam })}
+                  />
+                )}
+                <MinuteSlider
+                  id="milk-amount"
+                  label="Quantidade de leite"
+                  unit="%"
+                  value={settings.milkAmount}
+                  limits={SETTINGS_LIMITS.milkAmount}
+                  onChange={(milkAmount) => onChange({ milkAmount })}
+                />
               </div>
 
               <div className="flex flex-col gap-[calc(var(--px)*3)] border-t-[length:var(--px)] border-[var(--px-line)] pt-[calc(var(--px)*4)]">
