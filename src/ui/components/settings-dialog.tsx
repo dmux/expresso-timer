@@ -172,20 +172,20 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
 
                 <div className="flex flex-col gap-[calc(var(--px)*2)] pl-[calc(var(--px)*2)]">
                   <a
-                    href="https://rafaelsales.dev"
+                    href="https://rfsales.dev"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[var(--px-accent)] underline decoration-[length:var(--px)] underline-offset-4"
                   >
-                    rafaelsales.dev
+                    rfsales.dev
                   </a>
                   <a
-                    href="https://github.com/rafaelsales"
+                    href="https://github.com/dmux/expresso-timer"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[var(--px-accent)] underline decoration-[length:var(--px)] underline-offset-4"
                   >
-                    github.com/rafaelsales
+                    github.com/dmux/expresso-timer
                   </a>
                 </div>
               </div>
