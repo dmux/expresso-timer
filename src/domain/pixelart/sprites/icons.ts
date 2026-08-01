@@ -77,6 +77,17 @@ export const ICON_CLOSE = icon([
   "........",
 ])
 
+export const ICON_MINIMIZE = icon([
+  "........",
+  "........",
+  "........",
+  "........",
+  "........",
+  "..####..",
+  "..####..",
+  "........",
+])
+
 /** Filled bean = a focus already banked in the current cycle. */
 export const ICON_BEAN_FULL = icon([
   "........",

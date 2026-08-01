@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next"
 
+export const dynamic = "force-static"
+
 /**
  * Next serves this at `/manifest.webmanifest` and links it from every page.
  *

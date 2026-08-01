@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "src-tauri/**",
   ]),
 
   // The hexagon's dependency rule, made enforceable: the core points inward only.

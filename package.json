@@ -15,7 +15,12 @@
     "check:design": "node scripts/check-design-rules.mjs",
     "verify": "pnpm format:check && pnpm lint && pnpm check:design && pnpm typecheck && pnpm test",
     "prepare": "husky",
-    "gen:icons": "node scripts/generate-icons.mjs"
+    "gen:icons": "node scripts/generate-icons.mjs",
+    "tauri": "tauri",
+    "build:mac": "pnpm tauri build",
+    "build:linux": "pnpm tauri build",
+    "build:android": "pnpm tauri android build",
+    "build:ios": "pnpm tauri ios build"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -33,6 +38,8 @@
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
     "@tailwindcss/postcss": "^4.3.3",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/cli": "^2.11.4",
     "@types/node": "^20.19.43",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
