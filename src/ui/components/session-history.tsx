@@ -1,5 +1,7 @@
+import { useState } from "react"
 import type { SessionRecord } from "@/application/ports"
 import { PHASE_LABELS } from "@/domain/timer/phase"
+import { calculateInsights } from "@/domain/timer/insights"
 import { ScrollArea } from "@/ui/components/ui/scroll-area"
 import {
   Table,
@@ -15,27 +17,8 @@ type SessionHistoryProps = {
 }
 
 export function SessionHistory({ history }: SessionHistoryProps) {
-  const now = new Date()
-  const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate()
-  ).getTime()
-  const startOfWeek = startOfToday - now.getDay() * 24 * 60 * 60 * 1000
-
-  let todayFocusMs = 0
-  let weekFocusMs = 0
-
-  for (const record of history) {
-    if (record.phase === "focus") {
-      if (record.completedAt >= startOfToday) {
-        todayFocusMs += record.elapsedMs
-      }
-      if (record.completedAt >= startOfWeek) {
-        weekFocusMs += record.elapsedMs
-      }
-    }
-  }
+  const [now] = useState(() => Date.now())
+  const { todayFocusMs, weekFocusMs } = calculateInsights(history, now)
 
   const todayFocusMin = Math.round(todayFocusMs / 60_000)
   const weekFocusMin = Math.round(weekFocusMs / 60_000)
