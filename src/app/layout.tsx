@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Press_Start_2P } from "next/font/google"
 
+import { Analytics } from "@vercel/analytics/next"
 import { ServiceWorker } from "@/ui/components/service-worker"
 import { TooltipProvider } from "@/ui/components/ui/tooltip"
 import { THEME_INIT_SCRIPT } from "@/ui/theme"
@@ -70,6 +71,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <TooltipProvider>{children}</TooltipProvider>
         <ServiceWorker />
+        <Analytics />
       </body>
     </html>
   )
