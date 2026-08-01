@@ -70,6 +70,7 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
           <TabsList>
             <TabsTrigger value="timer">Timer</TabsTrigger>
             <TabsTrigger value="history">Histórico</TabsTrigger>
+            <TabsTrigger value="about">Sobre</TabsTrigger>
           </TabsList>
 
           <TabsContent value="timer">
@@ -152,6 +153,43 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
 
           <TabsContent value="history">
             <SessionHistory history={history} />
+          </TabsContent>
+
+          <TabsContent value="about">
+            <div className="flex flex-col gap-[calc(var(--px)*4)] pt-[calc(var(--px)*3)] text-[calc(var(--px)*2.5)]">
+              <div className="flex flex-col items-center gap-[calc(var(--px)*2)] pb-[calc(var(--px)*2)] text-center">
+                <span className="text-[calc(var(--px)*4)]">☕</span>
+                <span className="text-[calc(var(--px)*3)]">Expresso Timer</span>
+                <span className="text-[var(--px-text-muted)]">
+                  Um timer pomodoro com estilo pixel-art focado na sua produtividade (e no
+                  seu café).
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-[calc(var(--px)*3)] border-t-[length:var(--px)] border-[var(--px-line)] pt-[calc(var(--px)*4)]">
+                <span className="text-[var(--px-text-muted)]">Desenvolvido por</span>
+                <span className="text-[calc(var(--px)*3)]">Rafael Sales</span>
+
+                <div className="flex flex-col gap-[calc(var(--px)*2)] pl-[calc(var(--px)*2)]">
+                  <a
+                    href="https://rafaelsales.dev"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--px-accent)] underline decoration-[length:var(--px)] underline-offset-4"
+                  >
+                    rafaelsales.dev
+                  </a>
+                  <a
+                    href="https://github.com/rafaelsales"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--px-accent)] underline decoration-[length:var(--px)] underline-offset-4"
+                  >
+                    github.com/rafaelsales
+                  </a>
+                </div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>
