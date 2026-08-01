@@ -1,12 +1,13 @@
 "use client"
 
 import type { SessionRecord } from "@/application/ports"
-import { CUP_DESIGN_LABELS, CUP_DESIGNS, type CupDesign } from "@/domain/cup/cup-design"
+import { CUP_DESIGNS, type CupDesign } from "@/domain/cup/cup-design"
 import { CUP_ART } from "@/domain/pixelart/sprites/cups"
 import { ICON_GEAR } from "@/domain/pixelart/sprites/icons"
 import { SETTINGS_LIMITS, type PomodoroSettings } from "@/domain/timer/settings"
 import { PixelSprite } from "@/ui/components/pixel-sprite"
 import { SessionHistory } from "@/ui/components/session-history"
+import { useTranslation, type TranslationKey } from "@/ui/i18n/LanguageContext"
 import { Button } from "@/ui/components/ui/button"
 import {
   Dialog,
@@ -29,6 +30,7 @@ type SettingsDialogProps = {
 }
 
 export function SettingsDialog({ settings, history, onChange }: SettingsDialogProps) {
+  const { t, locale, setLocale } = useTranslation()
   return (
     <Dialog>
       <Tooltip>
@@ -39,7 +41,7 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
                 <Button
                   variant="secondary"
                   size="icon-lg"
-                  aria-label="Configurações e histórico"
+                  aria-label={t("settings.button")}
                 />
               }
             />
@@ -51,53 +53,50 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
             className="w-[calc(var(--px)*6)]"
           />
         </TooltipTrigger>
-        <TooltipContent>Configurações</TooltipContent>
+        <TooltipContent>{t("settings.tooltip")}</TooltipContent>
       </Tooltip>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ajustes</DialogTitle>
-          {/* Broken by hand rather than left to wrap: the close button sits over the
-              right end of the first line, and one sentence per line clears it. */}
-          <DialogDescription>
-            Durações em minutos.
-            <br />
-            Mudanças valem já na fase atual.
+          <DialogTitle>{t("settings.title")}</DialogTitle>
+          <DialogDescription className="whitespace-pre-line">
+            {t("settings.description")}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="timer">
           <TabsList>
-            <TabsTrigger value="timer">Timer</TabsTrigger>
-            <TabsTrigger value="history">Histórico</TabsTrigger>
+            <TabsTrigger value="timer">{t("settings.tabs.timer")}</TabsTrigger>
+            <TabsTrigger value="history">{t("settings.tabs.history")}</TabsTrigger>
+            <TabsTrigger value="about">{t("settings.tabs.about")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="timer">
             <div className="flex flex-col gap-[calc(var(--px)*5)] pt-[calc(var(--px)*3)]">
               <MinuteSlider
                 id="focus"
-                label="Foco"
+                label={t("settings.focus")}
                 value={settings.focusMinutes}
                 limits={SETTINGS_LIMITS.focusMinutes}
                 onChange={(focusMinutes) => onChange({ focusMinutes })}
               />
               <MinuteSlider
                 id="short-break"
-                label="Pausa curta"
+                label={t("settings.shortBreak")}
                 value={settings.shortBreakMinutes}
                 limits={SETTINGS_LIMITS.shortBreakMinutes}
                 onChange={(shortBreakMinutes) => onChange({ shortBreakMinutes })}
               />
               <MinuteSlider
                 id="long-break"
-                label="Pausa longa"
+                label={t("settings.longBreak")}
                 value={settings.longBreakMinutes}
                 limits={SETTINGS_LIMITS.longBreakMinutes}
                 onChange={(longBreakMinutes) => onChange({ longBreakMinutes })}
               />
               <MinuteSlider
                 id="cycles"
-                label="Focos por ciclo"
+                label={t("settings.cycles")}
                 unit=""
                 value={settings.cyclesUntilLongBreak}
                 limits={SETTINGS_LIMITS.cyclesUntilLongBreak}
@@ -105,28 +104,45 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
               />
 
               <div className="flex flex-col gap-[calc(var(--px)*3)] border-t-[length:var(--px)] border-[var(--px-line)] pt-[calc(var(--px)*4)]">
+                <LanguagePicker value={locale} onChange={setLocale} />
                 <DesignPicker
                   value={settings.cupDesign}
                   onChange={(cupDesign) => onChange({ cupDesign })}
+                />
+                {settings.cupDesign === "mug" && (
+                  <Toggle
+                    id="cappuccino-foam"
+                    label={t("settings.foam")}
+                    checked={settings.cappuccinoFoam}
+                    onChange={(cappuccinoFoam) => onChange({ cappuccinoFoam })}
+                  />
+                )}
+                <MinuteSlider
+                  id="milk-amount"
+                  label={t("settings.milk")}
+                  unit="%"
+                  value={settings.milkAmount}
+                  limits={SETTINGS_LIMITS.milkAmount}
+                  onChange={(milkAmount) => onChange({ milkAmount })}
                 />
               </div>
 
               <div className="flex flex-col gap-[calc(var(--px)*3)] border-t-[length:var(--px)] border-[var(--px-line)] pt-[calc(var(--px)*4)]">
                 <Toggle
                   id="auto-start"
-                  label="Iniciar próxima fase sozinho"
+                  label={t("settings.autoStart")}
                   checked={settings.autoStartNext}
                   onChange={(autoStartNext) => onChange({ autoStartNext })}
                 />
                 <Toggle
                   id="sound"
-                  label="Som ao terminar"
+                  label={t("settings.sound")}
                   checked={settings.soundEnabled}
                   onChange={(soundEnabled) => onChange({ soundEnabled })}
                 />
                 <Toggle
                   id="notifications"
-                  label="Notificação do sistema"
+                  label={t("settings.notifications")}
                   checked={settings.notificationsEnabled}
                   onChange={(notificationsEnabled) => onChange({ notificationsEnabled })}
                 />
@@ -136,6 +152,44 @@ export function SettingsDialog({ settings, history, onChange }: SettingsDialogPr
 
           <TabsContent value="history">
             <SessionHistory history={history} />
+          </TabsContent>
+
+          <TabsContent value="about">
+            <div className="flex flex-col gap-[calc(var(--px)*4)] pt-[calc(var(--px)*3)] text-[calc(var(--px)*2.5)]">
+              <div className="flex flex-col items-center gap-[calc(var(--px)*2)] pb-[calc(var(--px)*2)] text-center">
+                <span className="text-[calc(var(--px)*4)]">☕</span>
+                <span className="text-[calc(var(--px)*3)]">{t("app.title")}</span>
+                <span className="text-[var(--px-text-muted)]">
+                  {t("about.description")}
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-[calc(var(--px)*3)] border-t-[length:var(--px)] border-[var(--px-line)] pt-[calc(var(--px)*4)]">
+                <span className="text-[var(--px-text-muted)]">
+                  {t("about.developedBy")}
+                </span>
+                <span className="text-[calc(var(--px)*3)]">Rafael Sales</span>
+
+                <div className="flex flex-col gap-[calc(var(--px)*2)] pl-[calc(var(--px)*2)]">
+                  <a
+                    href="https://rfsales.dev"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--px-accent)] underline decoration-[length:var(--px)] underline-offset-4"
+                  >
+                    rfsales.dev
+                  </a>
+                  <a
+                    href="https://github.com/dmux/expresso-timer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--px-accent)] underline decoration-[length:var(--px)] underline-offset-4"
+                  >
+                    github.com/dmux/expresso-timer
+                  </a>
+                </div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>
@@ -191,12 +245,13 @@ function DesignPicker({
   value: CupDesign
   onChange: (design: CupDesign) => void
 }) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-[calc(var(--px)*2)]">
-      <span className="text-[calc(var(--px)*3)]">Modelo do copo</span>
+      <span className="text-[calc(var(--px)*3)]">{t("settings.cupModel")}</span>
       <div
         role="radiogroup"
-        aria-label="Modelo do copo"
+        aria-label={t("settings.cupModel")}
         className="flex gap-[calc(var(--px)*3)]"
       >
         {CUP_DESIGNS.map((design) => (
@@ -213,7 +268,40 @@ function DesignPicker({
               level={1}
               className="w-[calc(var(--px)*14)]"
             />
-            {CUP_DESIGN_LABELS[design]}
+            {t(`cup.${design}` as TranslationKey)}
+          </Button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function LanguagePicker({
+  value,
+  onChange,
+}: {
+  value: "en-US" | "pt-BR"
+  onChange: (locale: "en-US" | "pt-BR") => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <div className="flex flex-col gap-[calc(var(--px)*2)] pb-[calc(var(--px)*2)]">
+      <span className="text-[calc(var(--px)*3)]">{t("settings.language")}</span>
+      <div
+        role="radiogroup"
+        aria-label={t("settings.language")}
+        className="flex gap-[calc(var(--px)*3)]"
+      >
+        {(["en-US", "pt-BR"] as const).map((lang) => (
+          <Button
+            key={lang}
+            role="radio"
+            aria-checked={value === lang}
+            variant={value === lang ? "default" : "outline"}
+            onClick={() => onChange(lang)}
+            className="flex-1 text-[calc(var(--px)*2.5)]"
+          >
+            {t(`language.${lang}` as TranslationKey)}
           </Button>
         ))}
       </div>

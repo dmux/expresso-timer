@@ -27,6 +27,8 @@ export type CupFrame = {
   /** 1 = full, 0 = empty. */
   readonly level: number
   readonly steam: readonly SteamParticle[]
+  readonly milkAmount: number
+  readonly cappuccinoFoam: boolean
 }
 
 export type CupRenderer = {
@@ -91,9 +93,31 @@ export function createCanvasCupRenderer(canvas: HTMLCanvasElement): CupRenderer 
   }
 }
 
+function parseColor(c: string): [number, number, number] {
+  if (c.startsWith("#")) {
+    const hex = c.length === 4 ? "#" + c[1] + c[1] + c[2] + c[2] + c[3] + c[3] : c
+    const bigint = parseInt(hex.slice(1), 16)
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255]
+  }
+  const match = c.match(/\d+/g)
+  if (match && match.length >= 3) {
+    return [parseInt(match[0], 10), parseInt(match[1], 10), parseInt(match[2], 10)]
+  }
+  return [0, 0, 0]
+}
+
+function blendColors(c1: string, c2: string, amount: number): string {
+  const [r1, g1, b1] = parseColor(c1)
+  const [r2, g2, b2] = parseColor(c2)
+  const r = Math.round(r1 + (r2 - r1) * amount)
+  const g = Math.round(g1 + (g2 - g1) * amount)
+  const b = Math.round(b1 + (b2 - b1) * amount)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 function drawCup(
   ctx: CanvasRenderingContext2D,
-  { design, level }: CupFrame,
+  { design, level, milkAmount, cappuccinoFoam }: CupFrame,
   palette: ResolvedPalette
 ) {
   const { sprite } = CUP_ART[design]
@@ -101,19 +125,35 @@ function drawCup(
   const { width } = sprite
   let current: string | null = null
 
+  const surfaceIndex = cells.findIndex((c) => c === "crema")
+  const surfaceRow = surfaceIndex >= 0 ? Math.floor(surfaceIndex / width) : -1
+
   for (let index = 0; index < cells.length; index += 1) {
     const cell = cells[index]
     if (!cell) continue
 
-    const color = palette[cell]
-    if (color !== current) {
-      ctx.fillStyle = color
-      current = color
+    let cellColor = palette[cell]
+
+    if (cell === "coffee" || cell === "crema") {
+      cellColor = blendColors(cellColor, palette.steam, (milkAmount / 100) * 0.8)
+    }
+
+    const y = Math.floor(index / width)
+
+    if (cappuccinoFoam && design === "mug" && (cell === "crema" || cell === "coffee")) {
+      if (y >= surfaceRow && y < surfaceRow + 4) {
+        cellColor = palette.steam
+      }
+    }
+
+    if (cellColor !== current) {
+      ctx.fillStyle = cellColor
+      current = cellColor
     }
 
     const x = index % width
-    const y = Math.floor(index / width) + CUP_OFFSET_Y
-    ctx.fillRect(x, y, 1, 1)
+    const canvasY = y + CUP_OFFSET_Y
+    ctx.fillRect(x, canvasY, 1, 1)
   }
 }
 

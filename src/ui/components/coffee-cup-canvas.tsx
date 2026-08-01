@@ -22,9 +22,16 @@ import { useTheme } from "@/ui/theme"
 type CoffeeCupCanvasProps = {
   session: Session
   design: CupDesign
+  milkAmount: number
+  cappuccinoFoam: boolean
 }
 
-export function CoffeeCupCanvas({ session, design }: CoffeeCupCanvasProps) {
+export function CoffeeCupCanvas({
+  session,
+  design,
+  milkAmount,
+  cappuccinoFoam,
+}: CoffeeCupCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rendererRef = useRef<CupRenderer | null>(null)
   const steamRef = useRef<SteamParticle[]>([])
@@ -77,7 +84,7 @@ export function CoffeeCupCanvas({ session, design }: CoffeeCupCanvasProps) {
       )
     }
 
-    renderer.draw({ design, level, steam: steamRef.current })
+    renderer.draw({ design, level, steam: steamRef.current, milkAmount, cappuccinoFoam })
   }, pixelSize > 0)
 
   return (

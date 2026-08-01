@@ -1,4 +1,5 @@
 import { PomodoroService } from "@/application/pomodoro-service"
+import { dictionaries } from "@/ui/i18n/dictionaries"
 import { createBrowserNotifier } from "@/infrastructure/browser-notifier"
 import { createCompositeNotifier } from "@/infrastructure/composite-notifier"
 import { createLocalStorageSessionLog } from "@/infrastructure/local-storage-session-log"
@@ -29,5 +30,17 @@ export function createPomodoroService(): PomodoroService {
     notifier: browser
       ? createCompositeNotifier([createWebAudioNotifier(), createBrowserNotifier()])
       : nullNotifier,
+    translate: (key: string) => {
+      if (!browser) return key
+
+      let lang = window.localStorage.getItem("expresso-locale") as
+        "en-US" | "pt-BR" | null
+      if (!lang) {
+        lang = window.navigator.language.startsWith("pt") ? "pt-BR" : "en-US"
+      }
+
+      const dict = dictionaries[lang] || dictionaries["en-US"]
+      return dict[key as keyof typeof dict] || key
+    },
   })
 }

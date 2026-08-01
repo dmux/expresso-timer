@@ -25,6 +25,8 @@ const schema = z.object({
   // Defaulted rather than required: settings saved before the design picker existed
   // must still load, instead of failing the parse and resetting every other field.
   cupDesign: z.enum(CUP_DESIGNS).default(DEFAULT_CUP_DESIGN),
+  milkAmount: minutes(SETTINGS_LIMITS.milkAmount).default(20),
+  cappuccinoFoam: z.boolean().default(false),
 })
 
 export function createLocalStorageSettingsRepository(

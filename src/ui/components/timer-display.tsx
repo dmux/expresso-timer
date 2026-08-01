@@ -1,7 +1,9 @@
 import { msToClock } from "@/domain/shared/duration"
 import { ICON_BEAN_EMPTY, ICON_BEAN_FULL } from "@/domain/pixelart/sprites/icons"
-import { isBreak, PHASE_LABELS, type Phase } from "@/domain/timer/phase"
 import { PixelSprite } from "@/ui/components/pixel-sprite"
+
+import { useTranslation, type TranslationKey } from "@/ui/i18n/LanguageContext"
+import { isBreak, type Phase } from "@/domain/timer/phase"
 
 type TimerDisplayProps = {
   phase: Phase
@@ -16,6 +18,7 @@ export function TimerDisplay({
   completedFocusCount,
   cyclesUntilLongBreak,
 }: TimerDisplayProps) {
+  const { t } = useTranslation()
   const beansFilled = completedFocusCount % cyclesUntilLongBreak
   const accent = isBreak(phase) ? "var(--px-rest)" : "var(--px-accent)"
 
@@ -25,7 +28,7 @@ export function TimerDisplay({
         className="text-[calc(var(--px)*3)] tracking-[calc(var(--px)*1.5)] uppercase"
         style={{ color: accent }}
       >
-        {PHASE_LABELS[phase]}
+        {t(`phase.${phase}` as TranslationKey)}
       </p>
 
       {/* The countdown is the live region; the canvas beside it is decorative. */}
@@ -40,7 +43,7 @@ export function TimerDisplay({
 
       <div
         className="flex items-center gap-[calc(var(--px)*2)]"
-        aria-label={`${beansFilled} de ${cyclesUntilLongBreak} focos no ciclo`}
+        aria-label={t("timer.cycles", { cycles: cyclesUntilLongBreak })}
         role="img"
       >
         {Array.from({ length: cyclesUntilLongBreak }, (_, index) => (
