@@ -18,29 +18,42 @@ type SessionHistoryProps = {
 
 export function SessionHistory({ history }: SessionHistoryProps) {
   const [now] = useState(() => Date.now())
-  const { todayFocusMs, weekFocusMs } = calculateInsights(history, now)
+  const { todayFocusMs, weekFocusMs, dailyTrendMs, weeklyTrendMs, monthlyTrendMs } =
+    calculateInsights(history, now)
 
   const todayFocusMin = Math.round(todayFocusMs / 60_000)
   const weekFocusMin = Math.round(weekFocusMs / 60_000)
+  const monthFocusMin = Math.round(monthlyTrendMs[5] / 60_000)
 
   return (
     <div className="flex flex-col gap-[calc(var(--px)*4)] pt-[calc(var(--px)*3)]">
-      <div className="flex gap-[calc(var(--px)*4)] border-b-[length:var(--px)] border-[var(--px-line)] pb-[calc(var(--px)*4)]">
-        <div className="flex flex-1 flex-col items-center justify-center">
+      <div className="flex gap-[calc(var(--px)*2)] border-b-[length:var(--px)] border-[var(--px-line)] pb-[calc(var(--px)*4)]">
+        <div className="flex flex-1 flex-col items-center justify-start">
           <span className="text-center text-[calc(var(--px)*2.5)] text-[var(--px-text-muted)]">
             Foco Hoje
           </span>
-          <span className="mt-[calc(var(--px)*2)] text-[calc(var(--px)*3.5)] tabular-nums">
+          <span className="mt-[calc(var(--px)*1)] text-[calc(var(--px)*3.5)] tabular-nums">
             {todayFocusMin} min
           </span>
+          <PixelSparkline data={dailyTrendMs} />
         </div>
-        <div className="flex flex-1 flex-col items-center justify-center border-l-[length:var(--px)] border-[var(--px-line)]">
+        <div className="flex flex-1 flex-col items-center justify-start border-l-[length:var(--px)] border-[var(--px-line)]">
           <span className="text-center text-[calc(var(--px)*2.5)] text-[var(--px-text-muted)]">
             Na Semana
           </span>
-          <span className="mt-[calc(var(--px)*2)] text-[calc(var(--px)*3.5)] tabular-nums">
+          <span className="mt-[calc(var(--px)*1)] text-[calc(var(--px)*3.5)] tabular-nums">
             {weekFocusMin} min
           </span>
+          <PixelSparkline data={weeklyTrendMs} />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-start border-l-[length:var(--px)] border-[var(--px-line)]">
+          <span className="text-center text-[calc(var(--px)*2.5)] text-[var(--px-text-muted)]">
+            No Mês
+          </span>
+          <span className="mt-[calc(var(--px)*1)] text-[calc(var(--px)*3.5)] tabular-nums">
+            {monthFocusMin} min
+          </span>
+          <PixelSparkline data={monthlyTrendMs} />
         </div>
       </div>
 
@@ -86,4 +99,24 @@ function formatTime(epochMs: number): string {
     hour: "2-digit",
     minute: "2-digit",
   })
+}
+
+function PixelSparkline({ data }: { data: number[] }) {
+  const max = Math.max(1, ...data)
+
+  return (
+    <div className="mt-[calc(var(--px)*3)] flex h-[calc(var(--px)*8)] w-full items-end justify-center gap-[calc(var(--px)*1.5)]">
+      {data.map((value, i) => {
+        const percentage = Math.max(2, (value / max) * 100)
+        return (
+          <div
+            key={i}
+            className="w-[calc(var(--px)*3)] bg-[var(--px-surface-inverted)] opacity-80"
+            style={{ height: `${percentage}%` }}
+            title={`${Math.round(value / 60_000)} min`}
+          />
+        )
+      })}
+    </div>
+  )
 }
