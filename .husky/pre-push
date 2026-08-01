@@ -1,0 +1,3 @@
+# The build is the one check worth its ~10s: it catches Server/Client boundary
+# mistakes and route-level type errors that `tsc --noEmit` alone does not.
+pnpm build

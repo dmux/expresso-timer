@@ -1,0 +1,14 @@
+# Fast, focused checks — this runs on every commit, so it stays a few seconds.
+# The expensive production build is deferred to pre-push.
+
+# Per-file: format and lint whatever is staged.
+pnpm lint-staged
+
+# Whole-project: none of these can be scoped to a staged file list.
+#   design rules — the pixel-art grammar and the sprite/interface colour split,
+#                  which no off-the-shelf linter knows how to check
+#   typecheck    — a staged file can break types in a file that is not staged
+#   tests        — the pure core runs in ~150ms, so there is no reason to skip it
+pnpm check:design
+pnpm typecheck
+pnpm test

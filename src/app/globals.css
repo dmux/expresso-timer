@@ -1,26 +1,293 @@
 @import "tailwindcss";
+@import "shadcn/tailwind.css";
+
+/*
+ * Pixel art design system.
+ *
+ * Rule of thumb: one logical pixel (--px) is the smallest unit of everything —
+ * size, spacing, border, type and motion are whole multiples of it. Any fractional
+ * value reintroduces interpolation and blurs an edge.
+ */
+
+/*
+ * Colour comes in two layers, and keeping them apart is what makes dark mode coherent:
+ *
+ *   sprite palette  — what the mug is physically made of. Mirrors PALETTE in
+ *                     src/domain/pixelart/palette.ts; only these names are valid inside
+ *                     a sprite, and the canvas resolves them from here at runtime.
+ *   semantic layer  — what the interface is made of. These are the ones that invert.
+ *
+ * A ceramic mug does not become dark just because the page did, so the two layers move
+ * independently. palette.test.ts guards the sprite half against the TypeScript source.
+ */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --px: 3px;
+
+  /* sprite palette — light */
+  --px-ink: #4a4340;
+  --px-cream: #f4f2ef;
+  --px-sand: #cdc7c0;
+  --px-coffee: #8a6a55;
+  --px-crema: #9d7d66;
+  --px-void: #3a3532;
+  --px-steam: #fbfaf8;
+
+  /* semantic interface layer — light */
+  --px-page: #e9d7bb;
+  --px-page-texture: #d9bfa0;
+  --px-surface: #f2e3cf;
+  --px-surface-alt: #d9bfa0;
+  --px-text: #2b1a10;
+  --px-text-muted: #8c6a4a;
+  --px-line: #2b1a10;
+  --px-bevel-light: #fbf5ec;
+  --px-bevel-dark: #c9a87c;
+  --px-accent: #c8552f;
+  --px-accent-hover: #a8421f;
+  --px-on-accent: #f2e3cf;
+  --px-rest: #4f7a4a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/*
+ * The theme is selected by `data-theme` on <html>, never by a media query. An inline
+ * script in the head resolves the stored preference — including "system" — to a
+ * concrete value before first paint, so this block is written once rather than twice
+ * (once for the media query, once for the explicit override).
+ */
+:root[data-theme="dark"] {
+  /* sprite palette — dark. Mirrors DARK_PALETTE. */
+  --px-ink: #14100e;
+  --px-cream: #e2dfda;
+  --px-sand: #a29c95;
+  --px-coffee: #8a6a55;
+  --px-crema: #a08069;
+  --px-void: #1c1816;
+  --px-steam: #e8e5e0;
+
+  /* semantic interface layer — dark */
+  --px-page: #17100a;
+  --px-page-texture: #241a12;
+  --px-surface: #2a1e14;
+  --px-surface-alt: #3b2a1c;
+  --px-text: #e8dcc6;
+  --px-text-muted: #a68d6b;
+  --px-line: #0d0805;
+  --px-bevel-light: #4a3524;
+  --px-bevel-dark: #150e08;
+  --px-accent: #e0764c;
+  --px-accent-hover: #f2916b;
+  --px-on-accent: #17100a;
+  --px-rest: #74a86a;
 }
 
-@media (prefers-color-scheme: dark) {
+/*
+ * The scale steps by whole multiples only — clamp() would put edges on half pixels and
+ * blur every border in the app. The 380px cut-off is deliberately below the common
+ * phone width (390–430px) so ordinary phones get --px: 3 and the panel, being
+ * width-based, actually fills the screen instead of floating in the middle.
+ */
+@media (max-width: 379px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --px: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (min-width: 1280px) {
+  :root {
+    --px: 4px;
+  }
+}
+
+@theme inline {
+  /* One value collapses every shadcn radius token, since they all derive from --radius. */
+  --radius: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
+  /*
+   * The shadcn semantic tokens become aliases of the pixel palette, so there is still
+   * exactly one source of truth for colour rather than two systems competing.
+   */
+  --color-background: var(--px-page);
+  --color-foreground: var(--px-text);
+  --color-card: var(--px-surface);
+  --color-card-foreground: var(--px-text);
+  --color-popover: var(--px-surface);
+  --color-popover-foreground: var(--px-text);
+  --color-primary: var(--px-accent);
+  --color-primary-foreground: var(--px-on-accent);
+  --color-secondary: var(--px-surface-alt);
+  --color-secondary-foreground: var(--px-text);
+  --color-muted: var(--px-surface-alt);
+  --color-muted-foreground: var(--px-text-muted);
+  --color-accent: var(--px-surface-alt);
+  --color-accent-foreground: var(--px-text);
+  --color-destructive: var(--px-accent);
+  --color-border: var(--px-line);
+  --color-input: var(--px-line);
+  --color-ring: var(--px-accent);
+
+  /*
+   * Literal family name on purpose: @theme inline resolves at parse time, so a runtime
+   * variable injected by next/font would never resolve here.
+   */
+  --font-sans: "Press Start 2P", ui-monospace, monospace;
+  --font-mono: "Press Start 2P", ui-monospace, monospace;
+  --font-heading: "Press Start 2P", ui-monospace, monospace;
+}
+
+/* --- utilities ------------------------------------------------------------ */
+
+/* Three-layer console bevel: dark outline, lit top-left, shaded bottom-right. */
+@utility pixel-bevel {
+  border: var(--px) solid var(--px-line);
+  box-shadow:
+    inset var(--px) var(--px) 0 0 var(--px-bevel-light),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 var(--px-bevel-dark);
+}
+
+/* The same bevel inverted — the pressed state. */
+@utility pixel-bevel-inset {
+  border: var(--px) solid var(--px-line);
+  box-shadow:
+    inset var(--px) var(--px) 0 0 var(--px-bevel-dark),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 var(--px-bevel-light);
+}
+
+/* Hard drop shadow — blur is never allowed. */
+@utility pixel-shadow {
+  box-shadow: calc(var(--px) * 2) calc(var(--px) * 2) 0 0 var(--px-line);
+}
+
+@utility pixel-shadow-sm {
+  box-shadow: var(--px) var(--px) 0 0 var(--px-line);
+}
+
+/* Discrete timing, so state changes read as frames rather than a fade. */
+@utility transition-pixel {
+  transition-property: background-color, color, border-color, box-shadow, transform;
+  transition-timing-function: steps(3);
+  transition-duration: 120ms;
+}
+
+/* 50% checkerboard — how this design system does translucency and gradients. */
+@utility pixel-dither {
+  background-image:
+    linear-gradient(
+      45deg,
+      var(--px-line) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--px-line) 75%
+    ),
+    linear-gradient(
+      45deg,
+      var(--px-line) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--px-line) 75%
+    );
+  background-size: calc(var(--px) * 2) calc(var(--px) * 2);
+  background-position:
+    0 0,
+    var(--px) var(--px);
+}
+
+/* Subtler version, for page background texture. */
+@utility pixel-dither-soft {
+  background-image:
+    linear-gradient(
+      45deg,
+      var(--px-page-texture) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--px-page-texture) 75%
+    ),
+    linear-gradient(
+      45deg,
+      var(--px-page-texture) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--px-page-texture) 75%
+    );
+  background-size: calc(var(--px) * 4) calc(var(--px) * 4);
+  background-position:
+    0 0,
+    calc(var(--px) * 2) calc(var(--px) * 2);
+}
+
+/* --- base ----------------------------------------------------------------- */
+
+@layer base {
+  * {
+    border-color: var(--px-line);
+    /* Backstop: nothing in this app is ever allowed a rounded corner. */
+    border-radius: 0 !important;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--px-page);
+    image-rendering: pixelated;
+    /* Derived from the attribute rather than set by the init script, so that script
+       touches one attribute instead of two — one less thing for React to find changed
+       when it hydrates. Themes scrollbars and form controls to match. */
+    color-scheme: light;
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--px-page);
+    color: var(--px-text);
+    /* Bitmap type must not be hinted into fractional coverage. */
+    -webkit-font-smoothing: none;
+  }
+
+  img,
+  canvas {
+    image-rendering: pixelated;
+  }
+
+  :focus-visible {
+    outline: var(--px) dashed var(--px-accent);
+    outline-offset: var(--px);
+  }
+
+  /* Steam is decorative; the level and the countdown still convey progress. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}
+
+/* Phase change: a 3-frame inversion instead of a cross-fade. */
+@keyframes pixel-flash {
+  0%,
+  100% {
+    background-color: var(--px-surface);
+  }
+  33% {
+    background-color: var(--px-line);
+  }
+  66% {
+    background-color: var(--px-surface);
+  }
+}
+
+.pixel-flash {
+  animation: pixel-flash 300ms steps(1) 1;
 }

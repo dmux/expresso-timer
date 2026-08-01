@@ -1,0 +1,8 @@
+.next
+node_modules
+pnpm-lock.yaml
+next-env.d.ts
+
+# Hand-aligned pixel matrices — Prettier would not touch the strings, but keeping the
+# sprites out avoids any risk of the rows being rewrapped.
+src/domain/pixelart/sprites/
