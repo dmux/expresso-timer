@@ -5,6 +5,10 @@ fumaça vai rareando. No intervalo o processo se inverte — a xícara reenche.
 
 Next.js 16 · React 19 · Tailwind v4 · shadcn/ui · arquitetura hexagonal
 
+## Preview
+
+![Preview do Expresso Timer](./expresso.gif)
+
 ## Rodando
 
 ```bash
