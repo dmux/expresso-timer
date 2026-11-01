@@ -17,6 +17,11 @@ jobs:
             args: "--target x86_64-apple-darwin"
           - platform: "ubuntu-22.04"
             args: ""
+          # Linux arm64 (aarch64) — p.ex. ClockworkPi uConsole CM4, Raspberry Pi.
+          # Runner arm64 nativo hospedado pelo GitHub (grátis em repo público);
+          # evita o cross-compile amd64→arm64, que é problemático com o webkit.
+          - platform: "ubuntu-22.04-arm"
+            args: ""
           - platform: "windows-latest"
             args: ""
 
@@ -43,7 +48,7 @@ jobs:
         run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
 
       - name: Install dependencies (Ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
+        if: startsWith(matrix.platform, 'ubuntu')
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
