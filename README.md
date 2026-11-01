@@ -9,6 +9,29 @@ Next.js 16 · React 19 · Tailwind v4 · shadcn/ui · arquitetura hexagonal
 
 ![Preview do Expresso Timer](./expresso.gif)
 
+### Variações
+
+Copo **Mug** e **Paper** (estilo Starbucks), em tema claro e escuro:
+
+<table width="100%">
+  <tr>
+    <td align="center" width="50%">Mug · claro</td>
+    <td align="center" width="50%">Mug · escuro</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/expresso-mug-light.gif" width="100%" alt="Mug, tema claro" /></td>
+    <td width="50%"><img src="docs/expresso-mug-dark.gif" width="100%" alt="Mug, tema escuro" /></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">Paper (Starbucks) · claro</td>
+    <td align="center" width="50%">Paper (Starbucks) · escuro</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/expresso-paper-light.gif" width="100%" alt="Copo paper, tema claro" /></td>
+    <td width="50%"><img src="docs/expresso-paper-dark.gif" width="100%" alt="Copo paper, tema escuro" /></td>
+  </tr>
+</table>
+
 ## Rodando
 
 ```bash
